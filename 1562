@@ -1,0 +1,42 @@
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+using namespace std;
+int yt[110][110],m,n;
+int fx[9]={0,0,1,-1,1,1,-1,-1},fy[9]={1,-1,0,0,1,-1,1,-1};
+void doit(int x,int y)
+{
+    yt[x][y]=0;
+		for(int k=0;k<8;++k)
+		{
+        int xx,yy;
+		    xx=x+fx[k];yy=y+fy[k];
+		    if(xx>=1&&xx<=n&&yy>=1&&yy<=m&&yt[xx][yy]==1)
+		    doit(xx,yy);
+		}
+}
+int main()
+{
+    char s;
+	  int i,j;
+	  while(cin>>n>>m&&n>0)
+	  {
+	      for(i=1;i<=n;++i)
+	       for(j=1;j<=m;++j)
+         {
+            cin>>s;
+            if(s=='@')
+            yt[i][j]=1;
+         }
+        int sum=0;
+        for(i=1;i<=n;++i)
+         for(j=1;j<=m;++j)
+          if(yt[i][j]==1)
+          {
+              doit(i,j);
+              sum++;
+          }
+        cout<<sum<<endl;
+    }
+    return 0;
+}
