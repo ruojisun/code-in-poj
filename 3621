@@ -1,0 +1,70 @@
+#include <cstdio>
+#include <queue>
+#include <cmath>
+#define N 5005
+#define eps 1e-8
+ 
+int n,m,f[N];
+bool vis[N];
+int cnt,head[N<<1],nextt[N<<1],to[N<<1],val[N<<1];
+double nval[N<<1],dis[N];
+inline void ins(int u,int v,int l)
+{
+    nextt[++cnt]=head[u];
+    to[cnt]=v;
+    val[cnt]=l;
+    head[u]=cnt;
+}
+void rebuild(double mid)
+{
+    for(int i=1;i<=cnt;++i)
+    nval[i]=(double)val[i]*mid-f[to[i]];
+}
+bool spfa(int x)
+{
+    vis[x]=1;
+    for(int i=head[x];i;i=nextt[i])
+    {
+        int v=to[i];
+        if(dis[v]>dis[x]+nval[i])
+        {
+            dis[v]=dis[x]+nval[i];
+            if(vis[v]||spfa(v))
+            {
+                vis[v]=0;
+                return 1;
+            }
+        }
+    }
+    vis[x]=0;
+    return 0;
+}
+bool check()
+{
+    for(int i=1;i<=n;++i) vis[i]=0,dis[i]=1e8;
+    for(int i=1;i<=n;++i)
+    if(spfa(i)) return 1;
+    return 0;
+}
+int Main()
+{
+    scanf("%d%d",&n,&m);
+    for(int i=1;i<=n;++i) scanf("%d",&f[i]);
+    for(int x,y,z;m--;)
+    {
+        scanf("%d%d%d",&x,&y,&z);
+        ins(x,y,z);
+    }
+    double l=0,r=10000,ans;
+    for(double mid;fabs(r-l)>=eps;)
+    {
+        mid=(l+r)/2;
+        rebuild(mid);
+        if(check()) l=mid+eps,ans=mid;
+        else r=mid-eps;
+    }
+    printf("%.2lf\n",ans);
+    return 0;
+}
+int sb=Main();
+int main(int argc,char *argv[]){;}
