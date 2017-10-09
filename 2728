@@ -1,0 +1,70 @@
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
+#include <cstdio>
+#include <cmath>
+#define N 1005
+#define rep(a,b,c) for(int x,y,z,a=b;a<=c;++a)
+#define eps 1e-8
+using namespace std;
+int n,cnt,fa[N],c[N][N];
+struct vill
+{
+	int x,y,z;
+	vill (int x=0,int y=0,int z=0):x(x),y(y),z(z){}	
+}v[N];
+double calc(int x1,int y1,int x2,int y2)
+{
+	return sqrt((double)((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)));
+}
+int find_(int x){return x==fa[x]?x:fa[x]=find_(fa[x]);}
+double d[N][N],dis[N];
+bool vis[N];
+double check(double p)
+{
+	memset(vis,0,sizeof(vis));
+	memset(dis,0x3f,sizeof(dis));
+	dis[1]=0;
+	vis[1]=1;
+	double sv=0;
+	rep(i,2,n) dis[i]=c[1][i]-p*d[1][i];
+	rep(i,1,n-1)
+	{
+		double minx=0x7fffffff*1.0;
+		int v;
+		rep(j,1,n)
+		 if(!vis[j]&&minx>dis[j])
+		  minx=dis[v=j];
+		vis[v]=1;
+		sv+=minx;
+		rep(j,1,n)
+		 if(!vis[j]&&dis[j]>c[v][j]-p*d[v][j])
+		  dis[j]=c[v][j]-p*d[v][j];
+	}
+	return sv;
+}
+int main(int argc,char *argv[])
+{
+	scanf("%d",&n);
+	for(;n;)
+	{
+		rep(i,1,n)
+		{
+			scanf("%d%d%d",&x,&y,&z);
+			v[i]=vill(x,y,z);
+		}
+		rep(i,1,n)
+		 rep(j,i+1,n)
+		 	d[i][j]=d[j][i]=calc(v[i].x,v[i].y,v[j].x,v[j].y),c[i][j]=c[j][i]=abs(v[i].z-v[j].z);	
+		double l=0.,r=10000.;
+		for(double mid;r-l>=eps;)
+		{
+			mid=(l+r)/2;
+			if(check(mid)>0) l=mid+eps;
+			else r=mid-eps;
+		}
+		printf("%.3lf\n",r);
+		scanf("%d",&n);
+	}
+	return 0;
+}
