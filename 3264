@@ -1,0 +1,65 @@
+#include <ctype.h>
+#include <cstdio>
+
+void read(int &x)
+{
+	x=0;bool f=0;
+	register char ch=getchar();
+	for(;!isdigit(ch);ch=getchar()) if(ch=='-') f=1;
+	for(; isdigit(ch);ch=getchar()) x=(x<<3)+(x<<1)+ch-'0';
+	x=f?(~x)+1:x;
+}
+int n,m;
+int max(int a,int b) {return a>b?a:b;}
+int min(int a,int b) {return a>b?b:a;}
+struct Typetree
+{
+	int l,r,dis,Max,Min;
+	Typetree *ch[2];
+	void pushup()
+	{
+		Max=max(ch[0]->Max,ch[1]->Max);
+		Min=min(ch[0]->Min,ch[1]->Min);
+	}
+	void build(int l,int r,int *a)
+	{
+		if(l==r)
+		{
+			dis=Max=Min=a[l];
+			return;
+		}
+		int mid=(l+r)>>1;
+		(ch[0]=new Typetree)->build(l,mid,a);
+		(ch[1]=new Typetree)->build(mid+1,r,a);
+		pushup();
+	}
+	int Query_Max(int l,int r,int L,int R)
+	{
+		if(L<=l&&r<=R) return Max;
+		int mid=(l+r)>>1,ret=-2;
+		if(L<=mid) ret=max(ch[0]->Query_Max(l,mid,L,R),ret);
+		if(R>mid) ret=max(ch[1]->Query_Max(mid+1,r,L,R),ret);
+		return ret;
+	}
+	int Query_Min(int l,int r,int L,int R)
+	{
+		if(L<=l&&r<=R) return Min;
+		int mid=(l+r)>>1,ret=0x7fffffff;
+		if(L<=mid) ret=min(ch[0]->Query_Min(l,mid,L,R),ret);
+		if(R>mid) ret=min(ch[1]->Query_Min(mid+1,r,L,R),ret);
+		return ret;
+	}
+}*root=new Typetree;
+int N,Q,data[50005];
+int main()
+{
+	read(N);read(Q);
+	for(int i=1;i<=N;i++) read(data[i]);
+	root->build(1,N,data);
+	for(int x,y;Q--;)
+	{
+		read(x);read(y);
+		printf("%d\n",root->Query_Max(1,N,x,y)-root->Query_Min(1,N,x,y));
+	}
+	return 0;
+}
