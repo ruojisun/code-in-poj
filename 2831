@@ -1,0 +1,80 @@
+#include <algorithm>
+#include <cstring>
+#include <cstdio>
+#include <vector>
+#include <queue>
+#define M 100005 
+#define N 1005
+
+using namespace std;
+struct Edge
+{
+	int x,y,z;
+	bool operator <(Edge a)const
+	{
+		return z<a.z;
+	}
+}edge[M],oedge[M];
+bool vis[N];
+int fa[N],n,m,q,dist[N][N];
+int find_(int x) {return x==fa[x]?x:fa[x]=find_(fa[x]);}
+struct node
+{
+	int to,dis;
+	node (int to=0,int dis=0) : to(to),dis(dis) {}
+};
+vector<node>vec[N]; 
+void update(int s)
+{
+	memset(vis,0,sizeof(vis));
+	dist[s][s]=0;
+	vis[s]=1;
+	queue<int>Q;
+	Q.push(s);
+	for(int now=Q.front();!Q.empty();Q.pop(),now=Q.front())
+	{
+		for(int i=0;i<vec[now].size();i++)
+		{
+			int v=vec[now][i].to,w=vec[now][i].dis;
+			if(vis[v]) continue;
+			dist[s][v]=max(dist[s][now],w);
+			vis[v]=1;
+			Q.push(v);
+		}
+	}
+}
+int main()
+{
+	scanf("%d%d%d",&n,&m,&q);
+	for(int a,b,c,i=1;i<=m;i++)
+	{
+		scanf("%d%d%d",&a,&b,&c);
+		edge[i].x=a;
+		edge[i].y=b;
+		edge[i].z=c;
+		oedge[i]=edge[i];
+	}
+	for(int i=1;i<=n;i++) fa[i]=i;
+	sort(edge+1,edge+1+m);
+	int num=0;
+	for(int i=1;i<=m;i++)
+	{
+		int fx=find_(edge[i].x),fy=find_(edge[i].y); 
+		if(fx!=fy)
+		{
+			fa[fy]=fx;
+			num++;
+			vec[edge[i].x].push_back(node(edge[i].y,edge[i].z));
+			vec[edge[i].y].push_back(node(edge[i].x,edge[i].z));
+			if(num==n-1) break;
+		}
+	}
+	for(int i=1;i<=n;i++) update(i);
+	for(int xx,yy;q--;)
+	{
+		scanf("%d%d",&xx,&yy);
+		if(dist[oedge[xx].x][oedge[xx].y]>=yy) printf("Yes\n");
+		else printf("No\n");
+	}
+	return 0;
+}
