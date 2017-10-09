@@ -1,0 +1,110 @@
+#include <iostream>
+#include <cstring>
+#include <cstdio>
+#include <queue>
+#define M 100005
+#define N 1005
+using namespace std;
+struct node
+{
+	int to,f,g;
+	bool operator<(node a)const
+	{
+		if(f==a.f) return g>a.g;
+		return f>a.f;
+	}
+};
+struct Edge
+{
+	int next,to,val;
+};
+Edge edge1[M*2],edge2[M*2];
+int n,m,dist[N],head1[N],head2[N],cnt;
+bool vis[N];
+void spfa(int s)
+{
+	queue<int>Q;
+	for(int i=1;i<=n;++i) dist[i]=M,vis[i]=0;
+	dist[s]=0;
+	Q.push(s);
+	vis[s]=1;
+	while(!Q.empty())
+	{
+		int now=Q.front();Q.pop();
+		vis[now]=0;
+		for(int i=head2[now];i;i=edge2[i].next)
+		{
+			int v=edge2[i].to;
+			if(dist[v]>dist[now]+edge2[i].val)
+			{
+				dist[v]=dist[now]+edge2[i].val;
+				if(!vis[v])
+				{
+					vis[v]=1;
+					Q.push(v);
+				}
+			}
+		}
+	}
+}
+inline void ins(int u,int v,int w)
+{
+	edge1[++cnt].next=head1[u];
+	edge1[cnt].to=v;
+	edge1[cnt].val=w;
+	head1[u]=cnt;
+	edge2[cnt].next=head2[v];
+	edge2[cnt].to=u;
+	edge2[cnt].val=w;
+	head2[v]=cnt;
+}
+int Astar(int s,int t,int k)
+{
+	priority_queue<node>Q;
+	if(s==t) k++;
+	int cnt=0;
+	if(dist[s]==M) return -1;
+	node a,tmp;
+	a.to=s;
+	a.g=0;
+	a.f=a.g+dist[a.to];
+	Q.push(a);
+	while(!Q.empty())	
+	{
+		node now=Q.top();Q.pop();
+		if(now.to==t) cnt++;
+		if(cnt==k) return now.g;
+		for(int i=head1[now.to];i;i=edge1[i].next)
+		{
+			int v=edge1[i].to;
+			tmp.to=v;
+			tmp.g=now.g+edge1[i].val ;
+			tmp.f=tmp.g+dist[tmp.to];
+			Q.push(tmp);
+		}
+	}
+	return -1;
+}
+inline void init()
+{
+	cnt=0;
+	memset(head1,0,sizeof(head1));
+	memset(head2,0,sizeof(head2));
+}
+int main()
+{
+	for(int s,t,k;cin>>n>>m;)
+	{
+		init();
+		for(int x,y,z;m--;)
+		{
+			cin>>x>>y>>z;
+			ins(x,y,z); 
+		}
+		cin>>s>>t>>k;
+		spfa(t);
+		int ans=Astar(s,t,k);
+		cout<<ans<<endl;
+	}
+	return 0;
+}
