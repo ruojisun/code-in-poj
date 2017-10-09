@@ -1,0 +1,60 @@
+#include <ctype.h>
+#include <cstdio>
+#define gt ch=getchar()
+#define N 1000005
+void read(int &x)
+{
+    x=0;bool f=0;
+    char ch;gt;
+    while(!isdigit(ch))
+    {
+        if(ch=='-') f=1;
+        gt;
+    }
+    while(isdigit(ch))
+    {
+        x=x*10+ch-'0';
+        gt;
+    }
+    x=f?(~x)+1:x;
+}
+int ans_min[N],ans_max[N],Num[N],n,k,a[N+1],Que[N],l=1,r=0;
+int main()
+{
+    read(n);read(k);
+    for(int i=1;i<=n;i++) read(a[i]);
+    int i=1;
+    for(i=1;i<k;i++)
+    {
+        while(l<=r&&Que[r]>=a[i]) r--;
+        Que[++r]=a[i];
+        Num[r]=i;
+    }
+    for(;i<=n;i++)
+    {
+        while(l<=r&&Que[r]>=a[i]) r--;
+        Que[++r]=a[i];
+        Num[r]=i;
+        while(Num[l]<=i-k) l++;
+        ans_min[i-k+1]=Que[l];
+    }
+    for(int i=1;i<=n-k+1;i++) printf("%d ",ans_min[i]);
+    printf("\n");
+    l=1;r=0;i=1;
+    for(i=1;i<k;i++)
+    {
+        while(l<=r&&a[i]>=Que[r]) r--;
+        Que[++r]=a[i];
+        Num[r]=i;
+    }
+    for(;i<=n;i++)
+    {
+        while(l<=r&&a[i]>=Que[r]) r--;
+        Que[++r]=a[i];
+        Num[r]=i;
+        while(Num[l]<=i-k) l++;
+        ans_max[i-k+1]=Que[l];
+    }
+    for(i=1;i<=n-k+1;i++) printf("%d ",ans_max[i]);
+    return 0;
+}
