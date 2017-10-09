@@ -1,0 +1,44 @@
+#include<iostream>
+#include<cstdio>
+#include<cstring>
+#include<algorithm>
+#include <algorithm>
+#define N 101
+using namespace std;
+int map[N][N],len[N][N];
+int i,j,r,c,fx[5]={0,0,1,-1},fy[5]={1,-1,0,0};
+int dp(int i,int j)
+{
+    if(len[i][j]!=0)return len[i][j];
+    int maxx=0,s;
+    for(int t=0;t<4;t++)
+      {
+          int x=i+fx[t],y=j+fy[t];
+          if(x>=0&&x<r&&y>=0&&y<c&&map[x][y]<map[i][j])
+          {
+              s=dp(x,y);
+              maxx=max(s,maxx);
+          }
+           
+      }
+    len[i][j]=maxx+1;
+    return maxx+1;
+}
+ 
+int main()
+{
+	scanf("%d%d",&r,&c);
+        int mx=-1;
+        memset(len,0,sizeof(len));
+        for(int i=0;i<r;i++)
+         for(int j=0;j<c;j++)
+         scanf("%d",&map[i][j]);
+        for(int i=0;i<r;i++)
+         for(int j=0;j<c;j++)
+         {len[i][j]=dp(i,j);
+         
+          if(len[i][j]>mx)mx=max(mx,len[i][j]);
+      }
+      printf("%d\n",mx);
+    return 0;
+}
