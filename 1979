@@ -1,0 +1,40 @@
+#include<iostream>
+#include<cstring>
+using namespace std;
+int fg[21][21],ge=0,w,h;
+int fx[5]={0,0,1,-1},fy[5]={1,-1,0,0};
+void doit(int xx,int yy)
+{
+	fg[xx][yy]=0;
+	ge++;
+	for(int k=0;k<4;++k)
+	{
+		int xxx,yyy;
+		xxx=xx+fx[k];
+		yyy=yy+fy[k];
+		if(xxx>=1&&xxx<=h&&yyy>=1&&yyy<=w&&fg[xxx][yyy]==1)
+		doit(xxx,yyy);
+	}
+}
+int main()
+{
+	int x,y,i,j;
+	char s;
+	while(cin>>w>>h&&(h+w)>0)
+	{
+		memset(fg,0,sizeof(fg));
+		for(i=1;i<=h;++i)
+		 for(j=1;j<=w;++j)
+		{
+		  cin>>s;
+		 if(s=='.') fg[i][j]=1;
+		 if(s=='@') { 	x=i; 	y=j; }
+		}
+		 ge=0;
+		 fg[x][y]=0;
+		 doit(x,y);
+		cout<<ge<<endl;
+	
+	}
+	return 0;
+}
