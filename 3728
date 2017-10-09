@@ -1,0 +1,100 @@
+#include <cstring>
+#include <cstdio>
+#include <vector>
+#define N 205000
+
+using namespace std;
+vector<int>G[N];
+int max(int a,int b) {return a>b?a:b;}
+int min(int a,int b) {return a>b?b:a;}
+int ans,Minn,Maxn,Pri[N],n,m,dep[N],dad[N][25],Max[N][25],Min[N][25],up[N][25],down[N][25];
+void dfs(int x)
+{
+    dep[x]=dep[dad[x][0]]+1;
+    for(int i=0;dad[x][i];++i)
+    {
+        dad[x][i+1]=dad[dad[x][i]][i];
+        Max[x][i+1]=max(Max[x][i],Max[dad[x][i]][i]);
+        Min[x][i+1]=min(Min[x][i],Min[dad[x][i]][i]);
+        up[x][i+1]=max(up[x][i],up[dad[x][i]][i]);
+        up[x][i+1]=max(up[x][i+1],Max[dad[x][i]][i]-Min[x][i]);
+        down[x][i+1]=max(down[x][i],down[dad[x][i]][i]);
+        down[x][i+1]=max(down[x][i+1],Max[x][i]-Min[dad[x][i]][i]);
+    }
+    for(int i=0;i<G[x].size();++i)
+    {
+        int v=G[x][i];
+        if(dad[x][0]!=v)
+        {
+            dad[v][0]=x;
+            Max[v][0]=max(Pri[x],Pri[v]);
+            Min[v][0]=min(Pri[x],Pri[v]);
+            up[v][0]=max(0,Pri[x]-Pri[v]);
+            down[v][0]=max(0,Pri[v]-Pri[x]);
+            dfs(v);
+        }
+    }
+}
+int lca(int x,int y)
+{
+    if(dep[x]>dep[y]) swap(x,y);
+    for(int i=20;i>=0;--i)
+	if(dep[dad[y][i]]>=dep[x]) y=dad[y][i];
+    if(x==y) return x;
+    for(int i=20;i>=0;--i)
+	if(dad[y][i]!=dad[x][i]) x=dad[x][i],y=dad[y][i];
+    return dad[x][0];
+}
+void Up(int x,int y)
+{
+    for(int i=20;i>=0;--i)
+    {
+        if(dep[dad[x][i]]>=dep[y])
+        {
+            ans=max(ans,up[x][i]);
+            ans=max(ans,Max[x][i]-Minn);
+            Minn=min(Minn,Min[x][i]);
+            x=dad[x][i];
+        }
+	}
+}
+void Down(int x,int y)
+{
+    for(int i=20;i>=0;--i)
+    {
+        if(dep[dad[x][i]]>=dep[y])
+        {
+            ans=max(ans,down[x][i]);
+            ans=max(ans,Maxn-Min[x][i]);
+            Maxn=max(Maxn,Max[x][i]);
+            x=dad[x][i];
+        }
+    }
+}
+int main()
+{
+    scanf("%d",&n);
+    for(int i=1;i<=n;++i) scanf("%d",&Pri[i]);
+    for(int x,y,i=1;i<n;++i)
+    {
+        scanf("%d%d",&x,&y);
+        G[x].push_back(y);
+        G[y].push_back(x);  
+    }
+    memset(Min,0x3f,sizeof(Min));
+    dfs(1);
+    scanf("%d",&m);
+    for(int x,y;m--;)
+    {
+        scanf("%d%d",&x,&y);
+        if(x==y) {puts("0");continue;} 
+        int z=lca(x,y);
+		ans=0;
+        Minn=0x3f3f3f3f;
+		Maxn=-0x3f3f3f3f;
+		Up(x,z);
+		Down(y,z);
+        printf("%d\n",max(ans,Maxn-Minn));
+    }
+    return 0;
+}
