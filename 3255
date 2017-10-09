@@ -1,0 +1,110 @@
+#include <ctype.h>
+#include <cstdio>
+#include <vector>
+#include <queue>
+#define M 100005
+#define N 5005
+struct Edge
+{
+	int next,to,w;
+	Edge (int next=0,int to=0,int w=0) :next(next),to(to),w(w) {}
+};
+Edge edge1[M<<1],edge2[M<<1];
+using namespace std;
+int Min,n,r,cnt1,cnt2,dis[N],head1[N],head2[N];
+bool vis[N];
+struct node
+{
+	int to,g,f;
+	bool operator<(node a)const
+	{
+		if(f==a.f) return g>a.g;
+		else return f>a.f;
+	}
+};
+inline void Read(int &x)
+{
+	bool f=0;register char ch=getchar();
+	for(x=0;!isdigit(ch);ch=getchar()) if(ch=='-') f=1;
+	for(;isdigit(ch);x=x*10+ch-'0',ch=getchar());
+	x=f?-x:x;
+}
+void ins(int u,int v,int w)
+{
+	edge1[++cnt1]=Edge(head1[u],v,w);
+	head1[u]=cnt1;
+	edge1[++cnt1]=Edge(head1[v],u,w);
+	head1[v]=cnt1;
+	edge2[++cnt2]=Edge(head2[u],v,w);
+	head2[u]=cnt2;
+	edge2[++cnt2]=Edge(head2[v],u,w);
+	head2[v]=cnt2;
+}
+void spfa(int s)
+{
+	queue<int>q;
+	q.push(s);
+	for(int i=1;i<=n;++i) dis[i]=0x7fffffff;
+	dis[s]=0;
+	vis[s]=1;
+	for(int now;!q.empty();)
+	{
+		now=q.front();q.pop();
+		vis[now]=0;
+		for(int i=head2[now];i;i=edge2[i].next)
+		{
+			int v=edge2[i].to;
+			if(dis[v]>dis[now]+edge2[i].w)
+			{
+				dis[v]=dis[now]+edge2[i].w;
+				if(!vis[v])
+				{
+					vis[v]=1;
+					q.push(v);
+				}
+			}
+		}
+	}
+}
+int Astar(int s,int t)
+{
+	priority_queue<node>q;
+	node a;
+	a.to=s;
+	a.g=0;
+	a.f=a.g+dis[a.to];
+	q.push(a);
+	int cnt=0;
+	for(node now;!q.empty();)
+	{
+		now=q.top();q.pop(); 
+		if(now.to==t) cnt++;
+		if(cnt==1) Min=now.g;
+		if(cnt==2&&now.g==Min) cnt--;
+		if(cnt==2) return now.g;
+		for(int i=head1[now.to];i;i=edge1[i].next)
+		{
+			int v=edge1[i].to;
+			node tmp;
+			tmp.to=v;
+			tmp.g=now.g+edge1[i].w;
+			tmp.f=tmp.g+dis[tmp.to];
+			q.push(tmp);
+		}
+	}
+	return 0;
+}
+int main()
+{
+//	freopen("block.in","r",stdin);
+//	freopen("block.out","w",stdout); 
+	Read(n);Read(r);
+	for(int x,y,z;r--;)
+	{
+		Read(x);Read(y);Read(z);
+		ins(x,y,z);
+	}
+	spfa(n);
+	printf("%d\n",Astar(1,n));
+	return 0;
+}
