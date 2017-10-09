@@ -1,0 +1,130 @@
+#include <cstring>
+#include <ctype.h>
+#include <cstdio>
+#include <queue>
+#define M 6005
+#define N 1500
+using namespace std;
+void read(int &x)
+{
+	x=0;bool f=0;
+	char ch=getchar();
+	while(!isdigit(ch))
+	{
+		if(ch=='-') f=1;
+		ch=getchar();
+	}
+	while(isdigit(ch))
+	{
+		x=x*10+ch-'0';
+		ch=getchar();
+	}
+	x=f?(~x)+1:x;
+}
+int in[N],g[N][N],tim,dfn[N],col[N],sumcol,low[N],T,n,m,head[N],cnt,stack[N],top;
+bool instack[N],vis[N];
+struct node
+{
+	int next,to;
+}edge[M];
+void add(int u,int v)
+{
+	edge[++cnt].next=head[u];
+	edge[cnt].to=v;
+	head[u]=cnt;
+}
+int min(int a,int b)
+{
+	return a>b?b:a;
+}
+void dfs(int x)
+{
+	stack[++top]=x;
+	instack[x]=1;
+	vis[x]=1;
+	low[x]=dfn[x]=++tim;
+	for(int i=head[x];i;i=edge[i].next)
+	{
+		int v=edge[i].to;
+		if(instack[v]) low[x]=min(low[x],dfn[v]);
+		else if(!vis[v])
+		{
+			dfs(v);
+			low[x]=min(low[x],low[v]);
+		}
+	}
+	if(low[x]==dfn[x])
+	{
+		sumcol++;
+		while(x!=stack[top])
+		{
+			instack[stack[top]]=0;
+			col[stack[top--]]=sumcol;
+		}
+		instack[stack[top]]=0;
+		col[stack[top--]]=sumcol;
+	}
+}
+bool judge()
+{
+    queue<int>q;
+    for(int i=1;i<=sumcol;i++)
+    if(!in[i]) q.push(i);
+    if(q.size()>1) return false;
+    while(!q.empty())
+    {
+        int now=q.front();
+        q.pop();
+        for(int i=1;i<=sumcol;i++)
+        if(g[now][i])
+        {
+            in[i]--;
+            if(!in[i]) q.push(i);
+        }
+        if(q.size()>1) return false;
+    }
+    return true;
+}
+int main()
+{
+	read(T);
+	for(;T--;)
+	{
+		memset(head,0,sizeof(head));
+		memset(dfn,0,sizeof(dfn));
+		memset(vis,0,sizeof(vis));
+		memset(instack,0,sizeof(instack));
+		memset(col,0,sizeof(col));
+		memset(low,0,sizeof(low));
+		memset(in,0,sizeof(in));
+		memset(g,0,sizeof(g)); 
+		tim=0;top=0;sumcol=0;cnt=0;
+		bool f=false;
+		read(n);
+		read(m);
+		for(int x,y,i=1;i<=m;i++)
+		{
+			read(x);
+			read(y);
+			add(x,y);
+		}
+		for(int i=1;i<=n;i++)
+		if(!vis[i]) dfs(i);
+		if(sumcol==1) {printf("Yes\n");continue;}
+		for(int i=1;i<=n;i++)
+        {
+			for(int j=head[i];j;j=edge[j].next)
+            {
+                int v=edge[j].to;
+                if(i!=v&&col[i]!=col[v])
+                {
+                    g[col[i]][col[v]]=1;
+                    in[col[v]]++;
+                }
+            }
+		}
+		if(judge()) printf("Yes\n");
+		else printf("No\n");
+	}
+	return 0;
+}
