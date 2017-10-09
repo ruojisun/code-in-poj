@@ -1,0 +1,35 @@
+#include <cstring>
+#include <cstdio>
+#define N 1000005
+
+char str[N];
+int Next[N];
+void Get_next(int ln)
+{
+	int i=0,j=-1;
+	Next[i]=j;
+	for(;i<ln;)
+	{
+		if(j==-1||str[i]==str[j]) i++,j++,Next[i]=j;
+		else j=Next[j];
+	}
+}
+int main()
+{
+	for(;1;)
+	{
+		scanf("%s",str);
+		if(str[0]=='.') break;
+		int len=strlen(str);
+		Get_next(len);
+/*		for(int i=1;i<=len;i++) printf("%d ",Next[i]);
+		printf("\n");*/
+		if(2*Next[len]<len) printf("1\n");
+		else
+		{
+			if(len%(len-Next[len])==0) printf("%d\n",len/(len-Next[len]));
+			else printf("1\n");
+		}
+	}
+	return 0;
+}
