@@ -1,0 +1,31 @@
+#include<cstdio>
+int sum[100001];
+int main()
+{
+	int t,n,s,i,d,b,min,j;
+	scanf("%d",&t);
+	while(t--)
+	{
+		b=0;
+		scanf("%d%d",&n,&s);
+		min=n+1;
+		for(i=1;i<=n;i++)
+		{
+			scanf("%d",&d);
+			sum[i]=sum[i-1]+d;
+			if(sum[i]-sum[b]>=s)
+			{
+				if(i-min>b) b=i-min;
+				for(j=b+1;j<i;j++)
+				{
+					if(sum[i]-sum[j]<s) break;
+				}
+				min=i-j+1;
+				b=i-min+1;
+			}
+		}
+		if(min>n) printf("0\n");
+		else printf("%d\n",min);
+	}
+	return 0;
+}
