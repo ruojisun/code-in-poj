@@ -1,70 +1,54 @@
-#include <algorithm>
-#include <iostream>
-#include <cstring>
-#include <cstdio>
+#include<cstdio>
+#define N 30001
 
-using namespace std;
+int count[N], num[N], pre[N];
 
-struct node
+int find(int x)
 {
-	int x,y,dis;
-}Edge[100001];
-int fa[1001],N,i,a,tot,j,k;
-bool cmp(node a,node b)
-{
-	return a.dis<b.dis;
+	if(pre[x] == x)
+	return x;
+	int t = find(pre[x]);
+	count[x] += count[pre[x]];
+	pre[x] = t;
+	return t;
 }
-int find_fa(int k)
+void Union(int x, int y)
 {
-	return fa[k]==k?k:find_fa(fa[k]);
+	int i = find(x);
+	int j = find(y);
+	if(i == j)
+	{
+		return;
+	}
+	count[i] = num[j];
+    num[j] += num[i];
+	pre[i] = j;
 }
 int main()
 {
-	cin>>N;
-	int a;
-	for(i=1;i<=N;++i)
+	int i, x, y, n;
+	char s[2];
+	scanf("%d",&n);
+	for(i = 1; i <= N; i++)
 	{
-		for(j=1;j<=N;++j)
+		pre[i] = i;
+		num[i] = 1;
+		count[i] = 0;
+	}
+	for(i = 0; i < n; i++)
+	{
+		scanf("%s",s);
+		if(s[0] == 'M')
 		{
-			cin>>a;
-			if(a)
-			{
-				tot++;
-				Edge[tot].x=i;
-				Edge[tot].y=j;
-				Edge[tot].dis=a;
-			}
+			scanf("%d%d",&x,&y);
+			Union(x,y);
+		}
+		else if(s[0] == 'C')
+		{
+			scanf("%d",&x);
+			int c = find(x);
+			printf("%d\n",count[x]);
 		}
 	}
-	int Q;
-	cin>>Q;
-	int b,c;
-	for(i=1;i<=N;++i)
-	fa[i]=i;
-	int h=0;
-	while(Q--)
-	{
-		cin>>b>>c;
-		tot++;
-		Edge[tot].x=b;
-		Edge[tot].y=c;
-		Edge[tot].dis=0;
-	}
-	sort(Edge+1,Edge+1+tot,cmp);
-	int ans=0;
-	for(i=1;i<=tot;++i)
-	{
-		int x,y;
-		x=find_fa(Edge[i].x);
-		y=find_fa(Edge[i].y);
-		if(x!=y)
-		{
-			fa[y]=x;
-			h++;
-			ans+=Edge[i].dis;
-			if(h==N-1)
-			break;
-		}
-	}
-	cout<<ans;
+	return 0;
 }
