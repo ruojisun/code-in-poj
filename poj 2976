@@ -1,0 +1,45 @@
+#include <algorithm>
+#include <cstdio>
+#include <cctype>
+#define N 1005
+#define rep(a,b,c) for(int i=a;i<=b;i+=c)
+#define Rep(a,b,c) for(int i=b;i>a;i-=c)
+#define eps 1e-8
+using namespace std;
+
+inline void read(int &x)
+{
+	register char ch=getchar();
+	for (x=0;!isdigit(ch);ch=getchar());
+	for (;isdigit(ch);x=x*10+ch-'0',ch=getchar());
+}
+int n,k,a[N],b[N];
+double s[N];
+bool check(double p)
+{
+	rep(1,n,1) s[i]=a[i]-p*b[i];
+	double sum=0;
+	sort(s+1,s+1+n);
+	Rep(k,n,1) sum+=s[i];
+	return sum>0;
+}
+int main(int argc,char *argv[])
+{
+	read(n);read(k);
+	for(;;)
+	{
+		if(!n&&!k) return 0;
+		rep(1,n,1) read(a[i]);
+		rep(1,n,1) read(b[i]);
+		double l=0,r=1.0;
+		for(double mid;r-l>=eps;)
+		{
+			mid=(l+r)/2;
+			if(check(mid)) l=mid+eps;
+			else r=mid-eps;
+		}
+		printf("%.0lf\n",l*100);
+		read(n);read(k);
+	}
+	return 0;
+}
