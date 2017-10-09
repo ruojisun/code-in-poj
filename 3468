@@ -1,0 +1,85 @@
+#include <cstdio>
+#define Max 2000000
+
+struct Tree
+{
+    long long l,r;
+    long long lazy,dis;
+}tr[Max];
+long long n,m;
+void up(long long k)
+{
+    tr[k].dis=tr[k<<1].dis+tr[k<<1|1].dis;
+}
+void build(long long k,long long l,long long r)
+{
+    tr[k].l=l;tr[k].r=r;
+    if(l==r)
+    {
+        scanf("%lld",&tr[k].dis);
+        return;
+    }
+    long long mid=(l+r)>>1;
+    build(k<<1,l,mid);
+    build(k<<1|1,mid+1,r);
+    up(k);
+}
+void down(long long k)
+{
+    if(tr[k].l==tr[k].r) return;
+    tr[k<<1].lazy+=tr[k].lazy;
+    tr[k<<1|1].lazy+=tr[k].lazy;
+    tr[k<<1].dis+=tr[k].lazy*(tr[k<<1].r-tr[k<<1].l+1);
+    tr[k<<1|1].dis+=tr[k].lazy*(tr[k<<1|1].r-tr[k<<1|1].l+1);
+    tr[k].lazy=0;
+}
+void section_change(long long k,long long l,long long r,long long v)
+{
+    if(tr[k].l==l&&tr[k].r==r)
+    {
+        tr[k].dis+=v*(r-l+1);
+        tr[k].lazy+=v;
+        return;
+    }
+    if(tr[k].lazy) down(k);
+    long long mid=(tr[k].l+tr[k].r)>>1;
+    if(l>mid) section_change(k<<1|1,l,r,v);
+    else if(r<=mid) section_change(k<<1,l,r,v);
+    else section_change(k<<1,l,mid,v),section_change(k<<1|1,mid+1,r,v);
+    up(k);
+}
+long long section_query(long long k,long long l,long long r)
+{
+    if(tr[k].l==l&&tr[k].r==r) return tr[k].dis;
+    if(tr[k].lazy) down(k); 
+    long long mid=(tr[k].l+tr[k].r)>>1;
+    if(l>mid) return section_query(k<<1|1,l,r);
+    else if(r<=mid) return section_query(k<<1,l,r);
+    else return section_query(k<<1,l,mid)+section_query(k<<1|1,mid+1,r);
+}
+int main()
+{
+    scanf("%lld%lld",&n,&m);
+    build(1,1,n);
+    char ch[4];
+    for(long long x,y,z;m--;)
+    {
+        scanf("%s",ch+1);
+        switch(ch[1])
+        {
+            case 'C':
+            {
+                scanf("%lld%lld%lld",&x,&y,&z);
+                section_change(1,x,y,z);
+                break;
+            }
+            case 'Q':
+            {
+                scanf("%lld%lld",&x,&y);
+                printf("%lld\n",section_query(1,x,y));
+                break;
+            }
+        }
+    }
+    return 0;
+}
