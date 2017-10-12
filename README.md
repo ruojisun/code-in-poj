@@ -1,2 +1,1 @@
-# code-in-poj
-code
+code of poj.org
